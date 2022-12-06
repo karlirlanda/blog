@@ -2,6 +2,7 @@
 
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AuthController;
 use App\Http\Controllers\PostController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\UserController;
@@ -19,16 +20,22 @@ use App\Http\Controllers\ActivityLogController;
 |
 */
 
-Route::post('/auth/login', [UserController::class, 'login']);
+Route::post('/auth/login', [AuthController::class, 'login']);
 
 Route::middleware(['auth:user'])->group(function () {
+
+    Route::group(['prefix' => 'auth'], function () {
+        Route::post('/profile', [AuthController::class, 'profile']);
+        Route::post('/change-password', [AuthController::class, 'changePassword']);
+        Route::post('/logout', [AuthController::class, 'logout']);
+    });
+
     Route::prefix('user')->group(function () {
         Route::post('/list', [UserController::class, 'list']);
         Route::post('/create', [UserController::class, 'create']);
         Route::post('/read', [UserController::class, 'read']);
         Route::post('/update', [UserController::class, 'update']);
         Route::post('/delete', [UserController::class, 'delete']);
-        Route::post('/logout', [UserController::class, 'logout']);
     });
 
     Route::prefix('post')->group(function () {
@@ -37,7 +44,6 @@ Route::middleware(['auth:user'])->group(function () {
         Route::post('/read', [PostController::class, 'read']);
         Route::post('/update', [PostController::class, 'update']);
         Route::post('/delete', [PostController::class, 'delete']);
-        Route::post('/logout', [PostController::class, 'logout']);
     });
 
     Route::prefix('role')->group(function () {
@@ -46,7 +52,6 @@ Route::middleware(['auth:user'])->group(function () {
         Route::post('/read', [RoleController::class, 'read']);
         Route::post('/update', [RoleController::class, 'update']);
         Route::post('/delete', [RoleController::class, 'delete']);
-        Route::post('/logout', [RoleController::class, 'logout']);
     });
 
     Route::prefix('activity-log')->group(function () {
@@ -60,9 +65,4 @@ Route::middleware(['auth:user'])->group(function () {
         Route::post('/list', [AuthLogController::class, 'list']);
         Route::post('/create', [AuthLogController::class, 'create']);
     });
-
 });
-
-
-
-
