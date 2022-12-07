@@ -22,7 +22,7 @@ return new class extends Migration
             $table->string('username');
             $table->string('password');
             $table->integer('type')->default(3);
-            $table->unsignedBigInteger('role_id');
+            $table->unsignedBigInteger('role_id')->default(0);
             $table->timestamps();
         });
 

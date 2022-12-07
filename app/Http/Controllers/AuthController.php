@@ -2,16 +2,52 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Role;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Jenssegers\Agent\Facades\Agent;
 use Illuminate\Support\Facades\Hash;
 use App\Http\Requests\Authentication\LoginRequest;
+use App\Http\Requests\Authentication\RegisterRequest;
 use App\Http\Requests\Authentication\ChangePasswordRequest;
 
 class AuthController extends Controller
 {
+    public function register(RegisterRequest $request)
+    {
+        $request['password'] = Hash::make($request->password);
+
+        $data = User::create($request->all());
+
+        $status = 0;
+
+        /* set status to 1 and create a activity log if the data returns true */
+        if ($data) {
+
+            $status = 1;
+
+            $data = [
+                'action'  => 'register',
+                'after_data' => $data,
+                'user_id' => $data->id,
+                'user_type' => $data->type,
+                'table_name'  => 'user',
+                'table_id'  => $data->id,
+                'created_at' => Carbon::now()->format('Y-m-d H:i:s'),
+                'device' =>  Agent::device(),
+                'browser' =>  Agent::browser(),
+                'platform' => Agent::platform(),
+            ];
+
+            (new ActivityLogController)->create($data);
+        }
+
+        return response()->json([
+            'status' => $status
+        ]);
+    }
+
     public function login(LoginRequest $request)
     {
         $data = User::where('username', $request['username'])->first();

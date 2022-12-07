@@ -20,7 +20,10 @@ use App\Http\Controllers\ActivityLogController;
 |
 */
 
-Route::post('/auth/login', [AuthController::class, 'login']);
+Route::group(['prefix' => 'auth'], function () {
+    Route::post('/register', [AuthController::class, 'register']);
+    Route::post('/login', [AuthController::class, 'login']);
+});
 
 Route::middleware(['auth:user'])->group(function () {
 
